@@ -1,9 +1,16 @@
+from pathlib import Path
+from typing import Optional
 from delta.tables import DeltaTable, DeltaTableBuilder
 from pyspark.sql import SparkSession, DataFrame
-from typing import Optional
 
 
 class Helpers:
+
+    @staticmethod
+    def read_binary_at(path: Path):
+        with path.open("rb") as fb:
+            bindata = fb.read()
+        return bindata
 
     @staticmethod
     def generate_delta_table(df: DataFrame,
@@ -22,7 +29,7 @@ class Helpers:
         :param log_retention: How long to store transaction log entries
         :param deleted_file_retention: How long to wait before permanently deleting older files from older Snapshots
         :param data_skipping_index_cols: How many columns to index. The default is 32, but it is better to selectively index
-        :param cluster_by_col: Which column do you want cluster by on? (date) is the default here
+        :param cluster_by_col: Which column do you want cluster by on? (date) is the default here. This column must have stats index
         :return: The DeltaTable instance
         """
         spark = SparkSession.getActiveSession
